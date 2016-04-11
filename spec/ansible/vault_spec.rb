@@ -13,5 +13,15 @@ module Ansible
       end
     end
 
+    describe '#inspect' do
+      let(:vault) {
+        Vault.new(path: fixture_path('blank.yml'), password: 'this-is-the-password')
+      }
+
+      it 'must include only the first 4 characters of the password followed by elipses' do
+        expect(vault.inspect).to_not include 'this-is-the-password'
+        expect(vault.inspect).to include 'this...'
+      end
+    end
   end
 end
