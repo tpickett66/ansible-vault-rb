@@ -25,4 +25,15 @@ RSpec.configure do |config|
   config.profile_examples = 10
 
   config.include FixtureHelpers
+  config.include PythonHelper
+
+  config.before(:all) do
+    detect_python
+  end
+
+  config.before do |example|
+    if example.metadata[:python] && !PythonHelper.python_path
+      pending('Pending due to missing python')
+    end
+  end
 end
