@@ -6,10 +6,13 @@ module Ansible
     #   The encoded body of the file.
     # @!attribute [r] header
     #   The header of the file, not currently used.
+    # @!attribute [r] path
+    #   The path of the file being read.
     class FileReader
-      attr_reader :body, :header
+      attr_reader :body, :header, :path
 
       def initialize(path)
+        @path = path
         ::File.open(path, 'r') { |f|
           @header = f.gets.chomp
           @body = f.readlines.map(&:chomp).join

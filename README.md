@@ -26,7 +26,7 @@ Or install it yourself as:
 
 ## Usage
 
-### Reading the contents of a vault (Status: In Progress)
+### Reading the contents of a vault (Status: Completed)
 
 ```ruby
 require 'ansible/vault'
@@ -39,7 +39,7 @@ Yep, that's it! This call opens the vault file, verifies the included HMAC, and
 (assuming the HMAC checks out) decrypts the contents of the file and returns
 the String representation of the contents.
 
-### Writing new contents to a vault (Status: On Deck)
+### Writing new contents to a vault (Status: In Progress)
 
 ```ruby
 require 'ansible/vault'
