@@ -1,8 +1,30 @@
 #!/usr/bin/env bash
 set -euo pipefail
 IFS=$'\n\t'
-set -vx
+
+red=$'\e[31m'
+green=$'\e[32m'
+yellow=$'\e[33m'
+blue=$'\e[34m'
+bold=$'\e[1m'
+reset=$'\e[0m'
 
 bundle install
 
-# Do any other automated setup that you need to do here
+if hash python 2>/dev/null; then
+    PYTHON_MISSING=0
+else
+    echo "${bold}${yellow}Unable to locate python in \$PATH, please install it using your favorite package manager.${reset}"
+    PYTHON_MISSING=1
+fi
+
+if hash ansible-vault 2>/dev/null; then
+    ANSIBLE_MISSING=0
+else
+    echo "${bold}${yellow}Unable to locate ansible-vault in \$PATH, please install using pip or your favorite package manager.${reset}"
+    ANSIBLE_MISSING=1
+fi
+
+if PYTHON_MISSING || ANSIBLE_MISSING; then
+    echo "${bold}${yellow}One or more optional dependencies are missing${reset}"
+fi
