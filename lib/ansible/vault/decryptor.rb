@@ -1,4 +1,5 @@
 require 'ansible/vault/cryptor'
+require 'oroku_saki'
 
 module Ansible
   class Vault
@@ -9,26 +10,20 @@ module Ansible
       # @return [String] The String contents of the file.
       def plaintext
         return @plaintext if defined?(@plaintext)
-        verify_hmac!
+        unless hmac_matches?
+          raise HMACMismatch, 'HMAC encoded in the file does not match calculated one!'
+        end
         @plaintext = cipher(mode: :decrypt).update(file.ciphertext)
         padding_length = @plaintext[-1].codepoints.first
         @plaintext.sub!(/#{padding_length.chr}{#{padding_length}}\z/, '')
         @plaintext
       end
 
-      # Verifies that the HMAC present in the file matches the one we calculate
+      # Indicates if the HMAC present in the file matches the calculated one
       #
-      # TODO: Short circuit on incorrect file hmac length
-      # TODO: Run verification in constant time
-      #
-      # @return [TrueClass] True on success
-      # @raise [HMACMismatch] When the calculated HMAC does not match the read one.
-      def verify_hmac!
-        if calculated_hmac == file.hmac
-          true
-        else
-          raise HMACMismatch, 'HMAC encoded in the file does not match calculated one!'
-        end
+      # @return [Boolean]
+      def hmac_matches?
+        OrokuSaki.secure_compare(calculated_hmac, file.hmac)
       end
 
       private
