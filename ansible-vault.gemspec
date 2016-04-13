@@ -10,19 +10,23 @@ Gem::Specification.new do |spec|
   spec.email         = ["t.pickett66@gmail.com"]
 
   spec.summary       = %q{A ruby implementation of Ansible's vault utilities}
-  spec.description   = %q{A ruby implementation of Ansible's vault utilities}
-  spec.homepage      = "TODO: Put your gem's website or public repo URL here."
+  spec.description   = "A ruby implementation of Ansible's vault utilities. " \
+   "Currently supports the AES256 variant, no support for the original AES" \
+   "format is planned."
+  spec.homepage      = "https://github.com/tpickett66/ansible-vault-rb"
 
   spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
   spec.bindir        = "exe"
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
+  spec.license        = "MIT"
 
   spec.add_dependency "oroku_saki", "~> 1.1"
 
   spec.add_development_dependency "bundler", "~> 1.11"
   spec.add_development_dependency "rake", "~> 10.0"
   spec.add_development_dependency "rspec", "~> 3.0"
-  spec.add_development_dependency "guard-rspec"
-  spec.add_development_dependency "byebug"
+  spec.add_development_dependency "guard-rspec", "~> 4.6"
+  spec.add_development_dependency "byebug", "~> 8.2"
+  spec.add_development_dependency "yard", "~> 0.8.7"
 end
