@@ -27,7 +27,7 @@ Or install it yourself as:
 
 ## Usage
 
-### Reading the contents of a vault (Status: Completed)
+### Reading the contents of a vault
 
 ```ruby
 require 'ansible/vault'
@@ -40,7 +40,7 @@ Yep, that's it! This call opens the vault file, verifies the included HMAC, and
 (assuming the HMAC checks out) decrypts the contents of the file and returns
 the String representation of the contents.
 
-### Writing new contents to a vault (Status: In Progress)
+### Writing new contents to a vault 
 
 ```ruby
 require 'ansible/vault'
@@ -48,13 +48,13 @@ require 'ansible/vault'
 Ansible::Vault.write({
   path: '/path/to/file',
   password: 'foobar',
-  contents: 'My secrets.'
-}) # => true
+  plaintext: 'My secrets.'
+}) # => #<File:(closed)>
 ```
 
 This call overwrites anything at the path specified with the cyphertext of the
-supplied contents. The contents are expected to have been cast to a string
-prior to being supplied to this function.
+supplied contents. The plaintext is expected to have been cast to a string prior
+to being passed to this function.
 
 ## Development
 
