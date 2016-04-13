@@ -4,6 +4,7 @@ require 'ansible/vault'
 
 SPEC_PATH = Pathname.new(File.expand_path('..', __FILE__))
 FIXTURE_PATH = SPEC_PATH.join('fixtures')
+TMP_PATH = SPEC_PATH.join('..', 'tmp')
 
 Dir[SPEC_PATH.join('support', '**', '*.rb')].each do |path|
   require path
@@ -29,11 +30,14 @@ RSpec.configure do |config|
 
   config.before(:all) do
     detect_python
+    detect_ansible
   end
 
   config.before do |example|
     if example.metadata[:python] && !PythonHelper.python_path
       pending('Pending due to missing python')
+    elsif example.metadata[:ansible_vault] && !PythonHelper.ansible_vault_path
+      pending('Pending due to missing ansible-vault')
     end
   end
 end

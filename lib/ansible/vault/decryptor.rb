@@ -1,5 +1,4 @@
 require 'ansible/vault/cryptor'
-require 'oroku_saki'
 
 module Ansible
   class Vault
@@ -30,14 +29,6 @@ module Ansible
       end
 
       private
-
-      def calculated_hmac
-        return @calculated_hmac if defined?(@calculated_hmac)
-        digest = OpenSSL::Digest.new(HASH_ALGORITHM)
-        hmac_algorithm = OpenSSL::HMAC.new(hmac_key, digest)
-        hmac_algorithm << file.ciphertext
-        @calculated_hmac = hmac_algorithm.hexdigest
-      end
 
       def salt
         file.salt

@@ -17,9 +17,8 @@ module Ansible
 
       # The number of bytes in each key we need to generate
       KEY_LENGTH = 32
-      # The number of bytes in the IV needed for the cipher, a.k.a the
-      # block length
-      IV_LENGTH = 16
+      # The number of bytes in the cipher's block
+      BLOCK_SIZE = IV_LENGTH = 16
       # The number of iterations to use in the key derivation function, this
       # was pulled from the Ansible source. Do not change.
       KDF_ITERATIONS = 10_000
@@ -48,6 +47,14 @@ module Ansible
       end
 
       private
+
+      def calculated_hmac
+        return @calculated_hmac if defined?(@calculated_hmac)
+        digest = OpenSSL::Digest.new(HASH_ALGORITHM)
+        hmac_algorithm = OpenSSL::HMAC.new(hmac_key, digest)
+        hmac_algorithm << file.ciphertext
+        @calculated_hmac = hmac_algorithm.hexdigest
+      end
 
       def cipher(mode: :decrypt)
         @cipher ||= OpenSSL::Cipher.new(CIPHER).tap do |cipher|
