@@ -10,6 +10,9 @@ module Ansible
     #
     # @param path [String] The path to the file to read
     # @param password [String] The password for the file
+    # @return [String] The plaintext contents of the vault, this is marked for
+    #   zeroing before the GC reaps the object. Any data extracted/parsed from
+    #   this string should be similarly wiped from memory when no longer used.
     def self.read(path:, password:)
       new(path: path, password: password).plaintext
     end
@@ -20,7 +23,7 @@ module Ansible
     # @param password [String] The password for the file
     def initialize(path:, password:)
       @path = path
-      @password = password
+      @password = password.shred_later
     end
 
     # Inspect this vault
@@ -35,7 +38,9 @@ module Ansible
 
     # Extract the plaintext from a previously written vault file
     #
-    # @return [String] The plaintext contents of the vault
+    # @return [String] The plaintext contents of the vault, this is marked for
+    #   zeroing before the GC reaps the object. Any data extracted/parsed from
+    #   this string should be similarly wiped from memory when no longer used.
     def plaintext
       file = FileReader.new(@path)
       decryptor = Decryptor.new(password: @password, file: file)

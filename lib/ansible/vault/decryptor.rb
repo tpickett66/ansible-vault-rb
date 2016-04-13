@@ -7,7 +7,10 @@ module Ansible
     class Decryptor < Cryptor
       # Decrypts the ciphertext from the file and strips any padding found.
       #
-      # @return [String] The String contents of the file.
+      # @return [String] The plaintext contents of the file, this is marked for
+      #   zeroing before the GC reaps the object. Any data extracted/parsed
+      #   from this string should be similarly wiped from memory when no longer
+      #   used.
       def plaintext
         return @plaintext if defined?(@plaintext)
         unless hmac_matches?
@@ -16,7 +19,7 @@ module Ansible
         @plaintext = cipher(mode: :decrypt).update(file.ciphertext)
         padding_length = @plaintext[-1].codepoints.first
         @plaintext.sub!(/#{padding_length.chr}{#{padding_length}}\z/, '')
-        @plaintext
+        @plaintext.shred_later
       end
 
       # Indicates if the HMAC present in the file matches the calculated one

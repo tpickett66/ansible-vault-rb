@@ -86,9 +86,10 @@ module Ansible
           KDF_OUTPUT_LENGTH,
           HASH_ALGORITHM
         )
-        @cipher_key = key[0,KEY_LENGTH]
-        @hmac_key = key[KEY_LENGTH, KEY_LENGTH]
-        @iv = key[KEY_LENGTH*2, IV_LENGTH]
+        @cipher_key = key[0,KEY_LENGTH].shred_later
+        @hmac_key = key[KEY_LENGTH, KEY_LENGTH].shred_later
+        @iv = key[KEY_LENGTH*2, IV_LENGTH].shred_later
+        key.shred!
         nil
       end
     end
