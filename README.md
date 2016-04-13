@@ -1,4 +1,5 @@
 # Ansible::Vault
+[![Build Status](https://travis-ci.org/tpickett66/ansible-vault-rb.svg?branch=master)](https://travis-ci.org/tpickett66/ansible-vault-rb)
 
 A ruby implementation of the Ansible vault file format for use in tooling that
 needs to work with the vaults but doesn't want to shell out. The goal is to
