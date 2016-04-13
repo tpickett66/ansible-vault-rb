@@ -1,10 +1,12 @@
 require 'pathname'
+require 'fileutils'
 $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
 require 'ansible/vault'
 
 SPEC_PATH = Pathname.new(File.expand_path('..', __FILE__))
 FIXTURE_PATH = SPEC_PATH.join('fixtures')
 TMP_PATH = SPEC_PATH.join('..', 'tmp')
+FileUtils.mkdir_p(TMP_PATH.to_s)
 
 Dir[SPEC_PATH.join('support', '**', '*.rb')].each do |path|
   require path
