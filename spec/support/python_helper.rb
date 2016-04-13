@@ -6,7 +6,7 @@ module PythonHelper
   end
 
   def detect_python
-    stdout, stderr, status = Open3.capture3('command -v python')
+    stdout, stderr, status = Open3.capture3(%q{/usr/bin/env bash -c 'command -v python'})
     if status.exitstatus == 0
       PythonHelper.python_path = stdout.chomp
     else
