@@ -27,11 +27,12 @@ module Ansible
     #
     # @param path [String, Pathname] The path to the file to read
     # @param password [String] The password for the file
+    # @param options [Hash] Additional options, see {#initialize} for details
     # @return [String] The plaintext contents of the vault, this is marked for
     #   zeroing before the GC reaps the object. Any data extracted/parsed from
     #   this string should be similarly wiped from memory when no longer used.
-    def self.read(path:, password:)
-      new(path: path, password: password).read
+    def self.read(path:, password:, **options)
+      new(path: path, password: password, **options).read
     end
 
     # Encrypt plaintext using the supplied and write it to the specified location
@@ -40,20 +41,25 @@ module Ansible
     #   before writing
     # @param password [String] The password for the file
     # @param plaintext [String] The secrets to be protected
+    # @param options [Hash] Additional options, see {#initialize} for details
     # @return [File] The closed file handle the vault was written to
-    def self.write(path:, password:, plaintext:)
-      new(path: path, password: password, plaintext: plaintext).write
+    def self.write(path:, password:, plaintext:, **options)
+      new(path: path, password: password, plaintext: plaintext, **options).write
     end
 
     # Build a new Vault
     #
     # @param path [String, Pathname] The path to the file to read
     # @param password [String] The password for the file
+    # @param options [Hash] Additional options
     # @param plaintext [String] The plaintext of the file to be written when
     #   encrypting
-    def initialize(path:, password:, plaintext: :none)
+    # @option options [Boolean] :allow_blank_password Allow nil and empty string
+    #   passwords, defaults to false.
+    def initialize(path:, password:, plaintext: :none, **options)
       @path = path.to_s
-      @password = password.shred_later
+      @path = path
+      @password = validate_password(password, options).shred_later
       @plaintext = plaintext
       @plaintext.shred_later if String === @plaintext
     end
@@ -91,6 +97,16 @@ module Ansible
       return File.read(@path) unless file.encrypted?
       decryptor = Decryptor.new(password: @password, file: file)
       decryptor.plaintext
+    end
+
+    private
+
+    def validate_password(password, options)
+      if !options[:allow_blank_password] && (password.nil? || password.strip.empty?)
+        raise BlankPassword, 'A nil or empty string password was supplied!' \
+          'If this is expected set the allow_blank_password option.'
+      end
+      password or ''
     end
   end
 end
