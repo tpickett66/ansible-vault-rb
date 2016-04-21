@@ -2,10 +2,25 @@ require 'spec_helper'
 
 module Ansible
   RSpec.describe Vault do
+    describe '.encrypted?(path)' do
+      it 'must return true when the file is in the ansible vault format' do
+        expect(Ansible::Vault).to be_encrypted(fixture_path('empty.yml'))
+      end
+
+      it 'must return false when the file appears to be plaintext' do
+        expect(Ansible::Vault).to_not be_encrypted(fixture_path('plaintext.yml'))
+      end
+    end
+
     describe '.read(path:, password:)' do
       it 'must return the contents of a file encrypted using ansible-vault' do
         content = Ansible::Vault.read(path: fixture_path('empty.yml'), password: 'ansible')
         expect(content).to eq "---\n"
+      end
+
+      it 'must return the plaintext of an unencrypted file' do
+        content = Ansible::Vault.read(path: fixture_path('plaintext.yml'), password: 'nope')
+        expect(content).to eq File.read(fixture_path('plaintext.yml'))
       end
     end
 

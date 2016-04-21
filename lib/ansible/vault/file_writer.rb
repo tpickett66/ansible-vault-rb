@@ -16,9 +16,6 @@ module Ansible
       attr_reader :path
       attr_accessor :ciphertext, :hmac, :salt
 
-      # The standard header for Ansible's current vault format
-      HEADER = "$ANSIBLE_VAULT;1.1;AES256\n".freeze
-
       # Construct a new FileWriter
       #
       # @param [String] path The path to write the file out to.
@@ -31,7 +28,7 @@ module Ansible
       # @return [File] The closed file handle used to write the data out.
       def write
         File.open(path, 'w') { |file|
-          file.write(HEADER)
+          file.write(FILE_HEADER + "\n")
           file.write(encoded_body)
         }
       end
