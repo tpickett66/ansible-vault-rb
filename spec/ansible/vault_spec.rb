@@ -45,6 +45,34 @@ module Ansible
       end
     end
 
+    describe '#initialize(path:, password:, plaintext: :none, **options)' do
+      it 'must raise a helpful exception when the password is nil' do
+        expect {
+          Vault.new(
+            path: fixture_path('blank.yml'),
+            password: nil
+          )
+        }.to raise_error(Ansible::Vault::BlankPassword)
+      end
+
+      it 'must raise a helpful exception when the password is a whitespace only string' do
+        expect {
+          Vault.new(
+            path: fixture_path('blank.yml'),
+            password: ''
+          )
+        }.to raise_error(Ansible::Vault::BlankPassword)
+      end
+
+      it 'must allow a nil password when the allow_blank_password option is set' do
+          Vault.new(
+            path: fixture_path('blank.yml'),
+            password: nil,
+            allow_blank_password: true
+          )
+      end
+    end
+
     describe '#inspect' do
       let(:vault) {
         Vault.new(path: fixture_path('blank.yml'), password: 'this-is-the-password')
