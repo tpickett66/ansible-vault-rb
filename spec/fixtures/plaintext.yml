@@ -1,0 +1,6 @@
+---
+key: value
+foo: bar
+baz:
+  qux:
+    - 42

@@ -46,10 +46,23 @@ module Ansible
         @salt
       end
 
+      # Indicates if the file is in the encrypted format or not
+      #
+      # @return [Boolean]
+      def encrypted?
+        decode_body unless defined?(@salt)
+        # The header not matching is a dead giveaway that the file isn't what
+        # we're expecting. That, however, probably isn't enough so we'll check
+        # the HMAC for presence and length since it's very unlikely that
+        # decoding the file body will result in multiple chunks AND the second
+        # one being the correct length for a SHA256 HMAC.
+        @header == FILE_HEADER && !@hmac.nil? && @hmac.bytesize == 64
+      end
+
       private
 
       def decode_body
-        salt, @hmac, ciphertext = BinASCII.unhexlify(@body).split("\n")
+        salt, @hmac, ciphertext = BinASCII.unhexlify(@body).split("\n", 3)
         @ciphertext = BinASCII.unhexlify(ciphertext)
         @salt = BinASCII.unhexlify(salt)
       end

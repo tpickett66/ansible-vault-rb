@@ -30,6 +30,17 @@ module Ansible
             '9371efa1796a8c3d3752d0d64837cf21ddf1d57978773d43e23ab1f96c90e035'
         )
       end
+
+      describe '#encrypted?' do
+        it 'must return true when the file is in the correct format' do
+          expect(file).to be_encrypted
+        end
+
+        it 'must return false when the file is in an unexpected format' do
+          plaintext_file = FileReader.new(fixture_path('plaintext.yml'))
+          expect(plaintext_file).to_not be_encrypted
+        end
+      end
     end
   end
 end
