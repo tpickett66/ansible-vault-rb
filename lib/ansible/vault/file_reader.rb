@@ -14,8 +14,8 @@ module Ansible
       def initialize(path)
         @path = path
         ::File.open(path, 'r') { |f|
-          @header = f.gets.chomp
-          @body = f.readlines.map(&:chomp).join
+          @header, *body = f.readlines.map(&:chomp)
+          @body = Array(body).join
         }
       end
 
