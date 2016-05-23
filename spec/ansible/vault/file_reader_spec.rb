@@ -13,6 +13,12 @@ module Ansible
         it 'must extract the raw contents of the file removing line breaks' do
           expect(file.body).to match /\A[a-f0-9]*\z/
         end
+
+        it 'must handle a blank file' do
+          file = FileReader.new(fixture_path('blank.yml'))
+          expect(file.header).to be nil
+          expect(file.body).to eq ''
+        end
       end
 
       it 'must be able to extract the ciphertext from the encoded body' do

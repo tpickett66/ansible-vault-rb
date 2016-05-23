@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'tempfile'
 
 module Ansible
   RSpec.describe Vault do
