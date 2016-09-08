@@ -30,4 +30,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "listen", "< 3.1.0"
   spec.add_development_dependency "byebug", "~> 8.2"
   spec.add_development_dependency "yard", "~> 0.8.7"
+
+  spec.required_ruby_version = '>= 2.1.0'
 end
