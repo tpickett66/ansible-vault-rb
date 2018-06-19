@@ -40,6 +40,8 @@ Yep, that's it! This call opens the vault file, verifies the included HMAC, and
 (assuming the HMAC checks out) decrypts the contents of the file and returns
 the String representation of the contents.
 
+Password can be substituted by password_file: "/path/to/password_file".
+
 ### Writing new contents to a vault 
 
 ```ruby
