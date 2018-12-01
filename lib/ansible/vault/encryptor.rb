@@ -1,6 +1,7 @@
 require 'securerandom'
 
 require 'ansible/vault/cryptor'
+require 'ansible/vault/util'
 
 module Ansible
   class Vault
@@ -10,7 +11,7 @@ module Ansible
       #
       # @param [String] plaintext The source data to be encrypted
       def encrypt(plaintext)
-        padding_length = BLOCK_SIZE - plaintext.bytesize % BLOCK_SIZE
+        padding_length = Util::BLOCK_SIZE - plaintext.bytesize % Util::BLOCK_SIZE
         padded_plaintext = (plaintext + (padding_length.chr * padding_length)).shred_later
         file.ciphertext = cipher(mode: :encrypt).update(padded_plaintext) + cipher.final
         file.salt = salt
@@ -20,7 +21,7 @@ module Ansible
       private
 
       def salt
-        @salt ||= SecureRandom.random_bytes(KEY_LENGTH)
+        @salt ||= SecureRandom.random_bytes(Util::KEY_LENGTH)
       end
     end
   end
