@@ -1,6 +1,7 @@
 require 'openssl'
 
 require 'ansible/vault/error'
+require 'ansible/vault/util'
 
 module Ansible
   class Vault
@@ -14,20 +15,6 @@ module Ansible
     #     format.
     class Cryptor
       attr_reader :file
-
-      # The number of bytes in each key we need to generate
-      KEY_LENGTH = 32
-      # The number of bytes in the cipher's block
-      BLOCK_SIZE = IV_LENGTH = 16
-      # The number of iterations to use in the key derivation function, this
-      # was pulled from the Ansible source. Do not change.
-      KDF_ITERATIONS = 10_000
-      # The total number of bytes to be output by the key derivation function.
-      KDF_OUTPUT_LENGTH = (2 * KEY_LENGTH + IV_LENGTH)
-      # The hashing algorithm for use in the KDF and HMAC calculations
-      HASH_ALGORITHM = 'SHA256'.freeze
-      # The Cipher spec OpenSSL expects when building our cipher object.
-      CIPHER = 'AES-256-CTR'.freeze
 
       # Build a new cryptor object
       #
@@ -50,18 +37,11 @@ module Ansible
 
       def calculated_hmac
         return @calculated_hmac if defined?(@calculated_hmac)
-        digest = OpenSSL::Digest.new(HASH_ALGORITHM)
-        hmac_algorithm = OpenSSL::HMAC.new(hmac_key, digest)
-        hmac_algorithm << file.ciphertext
-        @calculated_hmac = hmac_algorithm.hexdigest
+        @calculated_hmac = Util.calculate_hmac(hmac_key, file.ciphertext)
       end
 
       def cipher(mode: :decrypt)
-        @cipher ||= OpenSSL::Cipher.new(CIPHER).tap do |cipher|
-          cipher.public_send(mode)
-          cipher.key = cipher_key
-          cipher.iv = iv
-        end
+        @cipher ||= Util.cipher(cipher_key, iv)
       end
 
       def cipher_key
@@ -83,20 +63,10 @@ module Ansible
       end
 
       def derive_keys
-        if salt.nil? || salt.strip.empty?
-          raise MissingSalt, "Unable to derive keys, no salt available!"
-        end
-        key = OpenSSL::PKCS5.pbkdf2_hmac(
-          @password,
-          salt,
-          KDF_ITERATIONS,
-          KDF_OUTPUT_LENGTH,
-          HASH_ALGORITHM
-        )
-        @cipher_key = key[0,KEY_LENGTH].shred_later
-        @hmac_key = key[KEY_LENGTH, KEY_LENGTH].shred_later
-        @iv = key[KEY_LENGTH*2, IV_LENGTH].shred_later
-        key.shred!
+        keys = Util.derive_keys(salt, @password)
+        @cipher_key = keys[:cipher_key]
+        @hmac_key = keys[:hmac_key]
+        @iv = keys[:iv]
         nil
       end
     end
