@@ -3,6 +3,7 @@ require 'oroku_saki'
 require 'ansible/vault/bin_ascii'
 require 'ansible/vault/encryptor'
 require 'ansible/vault/decryptor'
+require 'ansible/vault/text_decryptor'
 require 'ansible/vault/file_reader'
 require 'ansible/vault/file_writer'
 require 'ansible/vault/version'
@@ -12,6 +13,15 @@ module Ansible
   class Vault
     # The standard header for Ansible's current vault format
     FILE_HEADER = "$ANSIBLE_VAULT;1.1;AES256".freeze
+
+    # Indicate if the text at the supplied path appeard to be encrypted by
+    # Ansible Vault
+    #
+    # @param text [String] The encrypted text
+    # @param password [String] The password for the text
+    def self.decrypt(text:, password:)
+      TextDecryptor.decrypt(text: text, password: password)
+    end
 
     # Indicate if the file at the supplied path appeard to be encrypted by
     # Ansible Vault
