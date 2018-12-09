@@ -31,7 +31,7 @@ RSpec.configure do |config|
   config.include PythonHelper
 
   config.before(:all) do
-    detect_python
+    detect_python('python2')
     detect_ansible
   end
 
