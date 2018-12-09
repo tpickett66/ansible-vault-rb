@@ -29,7 +29,7 @@ module PythonHelper
   end
 
   def detect_ansible
-    stdout, stderr, status = Open3.capture3(%q{/usr/bin/env bash -c 'command -v ansible-vault'})
+    stdout, _, status = Open3.capture3(%q{/usr/bin/env bash -c 'command -v ansible-vault'})
     if status.exitstatus == 0
       PythonHelper.ansible_vault_path = stdout.chomp
     else
@@ -37,8 +37,8 @@ module PythonHelper
     end
   end
 
-  def detect_python
-    stdout, stderr, status = Open3.capture3(%q{/usr/bin/env bash -c 'command -v python'})
+  def detect_python(binary_name)
+    stdout, _, status = Open3.capture3("/usr/bin/env bash -c 'command -v #{binary_name}'")
     if status.exitstatus == 0
       PythonHelper.python_path = stdout.chomp
     else
