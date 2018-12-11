@@ -85,17 +85,50 @@ module Ansible
       end
     end
 
-    describe '.decrypt(text:, password:)' do
-      let(:text) { File.read(fixture_path('empty.yml')) }
-      let(:plaintext) { "this is my sekret, there are many like it...\n" }
-      it 'must return the contents of text encrypted using ansible-vault' do
-        content = Vault.decrypt(text: text, password: 'ansible')
-        expect(content).to eq "---\n"
-      end
+    describe '.decrypt_text(text:, password:)' do
+      let(:text) { 'exampletext' }
+      let(:password) { 'examplepassword' }
+      let(:fake_return) { Struct.new('FAKE') }
 
-      it 'must return the plaintext' do
-        content = Vault.decrypt(text: plaintext, password: 'ansible')
-        expect(content).to eq plaintext
+      it 'delegates to TextDecryptor.decrypt' do
+        expect(
+          Ansible::Vault::TextDecryptor
+        ).to receive(:decrypt).once.with(text: text, password: password).and_return(fake_return)
+
+        actual = described_class.decrypt_text(text: text, password: password)
+        expect(actual).to eq(fake_return)
+      end
+    end
+
+    describe '.parse_and_decrypt_yaml(text:, password:, whitelist_classes: [], whitelist_symbols: [], aliases: false)' do
+      let(:text) { 'exampletext' }
+      let(:password) { 'examplepassword' }
+      let(:fake_return) { Struct.new('FAKE') }
+      let(:whitelist_classes) { [Object] }
+      let(:whitelist_symbols) { %i(example) }
+      let(:aliases) { true }
+
+      it 'delegates to KeyValueDecryptor.decrypt' do
+        expect(
+          Ansible::Vault::KeyValueDecryptor
+        ).to receive(:decrypt)
+          .once
+          .with(
+            text: text,
+            password: password,
+            whitelist_classes: whitelist_classes,
+            whitelist_symbols: whitelist_symbols,
+            aliases: aliases
+          ).and_return(fake_return)
+
+        actual = described_class.parse_and_decrypt_yaml(
+          text: text,
+          password: password,
+          whitelist_classes: whitelist_classes,
+          whitelist_symbols: whitelist_symbols,
+          aliases: aliases
+        )
+        expect(actual).to eq(fake_return)
       end
     end
   end
