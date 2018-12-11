@@ -5,16 +5,22 @@ module Ansible
   class Vault
     RSpec.describe TextDecryptor do
       describe '.decrypt(text:, password:)' do
-        let(:text) { File.read(fixture_path('empty.yml')) }
-        let(:plaintext) { "this is my sekret, there are many like it...\n" }
-        it 'must return the contents of text encrypted using ansible-vault' do
-          content = TextDecryptor.decrypt(text: text, password: 'ansible')
-          expect(content).to eq "---\n"
+        context 'with encrypted text using ansible-vault' do
+          let(:text) { File.read(fixture_path('empty.yml')) }
+
+          it 'must return the decrypted contents' do
+            content = described_class.decrypt(text: text, password: 'ansible')
+            expect(content).to eq("---\n")
+          end
         end
 
-        it 'must return the plaintext' do
-          content = Vault.decrypt(text: plaintext, password: 'ansible')
-          expect(content).to eq plaintext
+        context 'with plaintext' do
+          let(:plaintext) { "this is my sekret, there are many like it...\n" }
+
+          it 'must return the plaintext' do
+            content = described_class.decrypt(text: plaintext, password: 'ansible')
+            expect(content).to eq(plaintext)
+          end
         end
       end
     end

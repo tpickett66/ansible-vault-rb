@@ -4,6 +4,7 @@ require 'ansible/vault/bin_ascii'
 require 'ansible/vault/encryptor'
 require 'ansible/vault/decryptor'
 require 'ansible/vault/text_decryptor'
+require 'ansible/vault/key_value_decryptor'
 require 'ansible/vault/file_reader'
 require 'ansible/vault/file_writer'
 require 'ansible/vault/version'
@@ -14,13 +15,38 @@ module Ansible
     # The standard header for Ansible's current vault format
     FILE_HEADER = "$ANSIBLE_VAULT;1.1;AES256".freeze
 
-    # Indicate if the text at the supplied path appeard to be encrypted by
-    # Ansible Vault
+    # Decrypt the ciphertext using specified password
     #
     # @param text [String] The encrypted text
     # @param password [String] The password for the text
+    # @deprecated Use `Ansible::Vault.decrypt_text` instead.
     def self.decrypt(text:, password:)
+      decrypt_text(text: text, password: password)
+    end
+
+    # Decrypt the ciphertext using specified password
+    # @param text [String] The encrypted text
+    # @param password [String] The password for the text
+    def self.decrypt_text(text:, password:)
       TextDecryptor.decrypt(text: text, password: password)
+    end
+
+    # Parse and decrypt the YAML contents
+    #
+    # @param text [String] The YAML containing encrypted text
+    # @param password [String] The password for the text
+    # @param whitelist_classes [Array<Class>] classes to whitelist as safe to parse
+    # @param whitelist_symbols [Array<Symbol>] symbols to whitelist as safe to parse
+    # @param aliases [bool] whether to enable use of YAML aliases or not
+    # @return [Object] The key(s) and plaintext contents of the ciphertext.
+    def self.parse_and_decrypt_yaml(text:, password:, whitelist_classes: [], whitelist_symbols: [], aliases: false)
+      KeyValueDecryptor.decrypt(
+        text: text,
+        password: password,
+        whitelist_classes: whitelist_classes,
+        whitelist_symbols: whitelist_symbols,
+        aliases: aliases
+      )
     end
 
     # Indicate if the file at the supplied path appeard to be encrypted by
